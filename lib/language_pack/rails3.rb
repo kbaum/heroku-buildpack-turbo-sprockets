@@ -56,7 +56,7 @@ private
   end
 
   # runs the tasks for the Rails 3.1 asset pipeline
-  def run_assets_precompile_rake_task
+  def run_assets_precompile_rake_task gemfile='Gemfile'
     instrument "rails3.run_assets_precompile_rake_task" do
       log("assets_precompile") do
         if File.exists?("public/assets/manifest.yml")
@@ -74,7 +74,7 @@ private
         FileUtils.mkdir_p('public')
         cache.load "public/assets"
 
-        precompile.invoke(env: rake_env)
+        precompile.invoke(env: rake_env.merge('BUNDLER_GEMFILE' => gemfile))
 
         if precompile.success?
           log "assets_precompile", :status => "success"
