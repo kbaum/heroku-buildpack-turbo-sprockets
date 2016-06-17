@@ -97,6 +97,7 @@ class LanguagePack::Ruby < LanguagePack::Base
         create_database_yml
         install_binaries
         run_assets_precompile_rake_task
+        run_assets_precompile_rake_task 'Gemfile.rails4'
       end
       super
     end
@@ -714,14 +715,14 @@ params = CGI.parse(uri.query || "")
     @node_js_installed ||= run("#{node_bp_bin_path}/node -v") && $?.success?
   end
 
-  def run_assets_precompile_rake_task
+  def run_assets_precompile_rake_task(gemfile='Gemfile')
     instrument 'ruby.run_assets_precompile_rake_task' do
 
       precompile = rake.task("assets:precompile")
       return true unless precompile.is_defined?
 
       topic "Precompiling assets"
-      precompile.invoke(env: rake_env)
+      precompile.invoke(env: rake_env.merge('BUNDLER_GEMFILE' => gemfile))
       if precompile.success?
         puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
       else
